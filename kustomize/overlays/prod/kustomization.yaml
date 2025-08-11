@@ -1,0 +1,37 @@
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namePrefix: prod-
+nameSuffix: "-01"
+
+resources:
+- ../../base
+
+images:
+- name: nginx
+  newName: nginx
+  newTag: "1.25"
+
+
+labels:
+  - pairs:
+      app: prod-kustomization
+    includeSelectors: true
+
+patches:
+- path: patch-replicas.yaml
+
+secretGenerator:
+- name: secret
+  files:
+  - password.txt
+  options:
+    disableNameSuffixHash: true
+
+configMapGenerator:
+- name: configmap
+  literals:
+  - database_host=dev-db.example.com
+  options:
+    disableNameSuffixHash: true
